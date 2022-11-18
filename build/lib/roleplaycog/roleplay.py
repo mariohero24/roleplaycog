@@ -7,9 +7,8 @@ class cog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	roleplay = discord.SlashCommandGroup("roleplay", "Roleplay cog from roleplaycog.roleplaygrouped")
 
-	@roleplay.command(description="Creates a character")
+	@discord.slash_command(description="Creates a character")
 	async def create(self, ctx: discord.ApplicationContext, image: discord.Option(discord.Attachment, description="Attachment to set as profile picture of your character"), name: discord.Option(str, description="Name of your character"), description: discord.Option(str, description="Description of your character")="No description"):
 		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}"):
 			os.makedirs(f"roleplaydata/characters/{ctx.author.id}")
@@ -24,7 +23,7 @@ class cog(commands.Cog):
 		await webhook.delete()
 
 
-	@roleplay.command(description="Sends a message as your character")
+	@discord.slash_command(description="Sends a message as your character")
 	async def send(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of the character"), message: discord.Option(str, description="Message to send as your character")):
 		if os.path.exists(f"roleplaydata/characters/{ctx.author.id}/{character}.json"):
 			with open(f"roleplaydata/characters/{ctx.author.id}/{character}.json") as f:
@@ -36,7 +35,7 @@ class cog(commands.Cog):
 		else: await ctx.respond("No such character found")
 
 	
-	@roleplay.command(description="Deletes a character")
+	@discord.slash_command(description="Deletes a character")
 	async def delete(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of the character")):
 		try:
 			os.remove(f"roleplaydata/characters/{ctx.author.id}/{character}.json")
@@ -45,7 +44,7 @@ class cog(commands.Cog):
 			await ctx.respond("No such character found")
 
 
-	@roleplay.command(description="Lists all the characters you have")
+	@discord.slash_command(description="Lists all the characters you have")
 	async def characters(self, ctx: discord.ApplicationContext):
 		embed = discord.Embed(colour=0x2f3136)
 		for dir in os.listdir(f"roleplaydata/characters/{ctx.author.id}"):
@@ -55,7 +54,7 @@ class cog(commands.Cog):
 		await ctx.respond(embed=embed)
 
 
-	@roleplay.command(description="Shows a character")
+	@discord.slash_command(description="Shows a character")
 	async def show(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of character")):
 		with open(f"roleplaydata/characters/{ctx.author.id}/{character}.json") as f:
 			data = json.load(f)
@@ -64,7 +63,7 @@ class cog(commands.Cog):
 		await ctx.respond(embed=embed)
 
 
-	@roleplay.command(description="Edit a character")
+	@discord.slash_command(description="Edit a character")
 	async def edit(self, ctx: discord.ApplicationContext, oldname: discord.Option(str, description="Name of character you want to edit"), newname: discord.Option(str, description="New name for your character")=None, image: discord.Option(discord.Attachment, description="New attachment to set as profile picture of your character")=None, description: discord.Option(str, description="New description for your character")=None):
 		with open(f"roleplaydata/characters/{ctx.author.id}/{oldname}.json") as f1:
 			data = json.load(f1)
