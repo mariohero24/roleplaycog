@@ -19,8 +19,8 @@ class cog(commands.Cog):
 				"name": name, "image": image.url, "description": description
 			}
 			json.dump(data, f2, indent=4)
-		webhook = await ctx.channel.create_webhook(name="CHARACTERHOOK")
-		await webhook.send("Hello.", username=name, avatar_url=data['image'])
+		webhook = await ctx.channel.create_webhook(name=data['name'])
+		await webhook.send("Hello.", avatar_url=data['image'])
 		await ctx.respond("Done", ephemeral=True)
 		await webhook.delete()
 
@@ -30,8 +30,8 @@ class cog(commands.Cog):
 		if os.path.exists(f"roleplaydata/characters/{ctx.author.id}/{character}.json"):
 			with open(f"roleplaydata/characters/{ctx.author.id}/{character}.json") as f:
 				data = json.load(f)
-				character = await ctx.channel.create_webhook(name="CHARACTERHOOK")
-				await character.send(message, username=data['name'], avatar_url=data['image'])
+				character = await ctx.channel.create_webhook(name=data['name'])
+				await character.send(message, avatar_url=data['image'])
 				await ctx.respond("Sent", ephemeral=True)
 				await character.delete()
 		else: await ctx.respond("No such character found")
@@ -73,29 +73,6 @@ class cog(commands.Cog):
 			data = json.load(f)
 			embed = discord.Embed(title=data['name'], colour=0x2f3136, description=data['description'])
 			embed.set_thumbnail(url=data['image'])
-		await ctx.respond(embed=embed)
-
-
-	@roleplay.command(name="edit", description="Edit a character")
-	async def roleplayedit(self, ctx: discord.ApplicationContext, oldname: discord.Option(str, description="Name of character you want to edit"), newname: discord.Option(str, description="New name for your character")=None, image: discord.Option(discord.Attachment, description="New attachment to set as profile picture of your character")=None, description: discord.Option(str, description="New description for your character")=None):
-		with open(f"roleplaydata/characters/{ctx.author.id}/{oldname}.json") as f1:
-			data = json.load(f1)
-			if newname == None:
-				newname = oldname
-			if image == None:
-				img = data['image']
-			else:
-				img = image.url
-			if description == None:
-				desc = data['description']
-			else:
-				desc = description
-			embed = discord.Embed(title=newname, colour=0x2f3136, description=data)
-			embed.set_thumbnail(url=image.url)
-			data2 = {"name": newname, "description": desc, "image": img}
-			os.remove(f"roleplaydata/characters/{ctx.author.id}/{oldname}.json")
-			with open(f"roleplaydata/characters/{ctx.author.id}/{newname}.json", "w") as f2:
-				json.dump(data2, f2, indent=4)
 		await ctx.respond(embed=embed)
 
 

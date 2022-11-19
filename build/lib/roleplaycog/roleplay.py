@@ -7,51 +7,57 @@ description = ""
 class cog(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
+		if not os.path.exists("roleplaydata/characters/"):
+			os.makedirs("roleplaydata/characters")
 
-
-	@discord.slash_command(name="create", description="Creates a character")
+	@discord.slash_command(name="create", description="Creates/edits a character")
 	async def roleplaycreatechar(self, ctx: discord.ApplicationContext, image: discord.Option(discord.Attachment, description="Attachment to set as profile picture of your character"), name: discord.Option(str, description="Name of your character"), description: discord.Option(str, description="Description of your character")="No description"):
-		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}"):
-			os.makedirs(f"roleplaydata/characters/{ctx.author.id}")
-		with open(f"roleplaydata/characters/{ctx.author.id}/{name}.json", "w") as f2:
-			data = {
-				"name": name, "image": image.url, "description": description
-			}
-			json.dump(data, f2, indent=4)
-		webhook = await ctx.channel.create_webhook(name="CHARACTERHOOK")
-		await webhook.send("Hello.", username=name, avatar_url=data['image'])
+		with open(f"roleplaydata/characters/{ctx.author.id}.json") as fr:
+			data = json.load(fr)
+			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fw:
+				data.update({f"{name}": {
+					"name": name, "image": image.url, "description": description
+				}})
+				json.dump(data, fw, indent=4)
+		webhook = await ctx.channel.create_webhook(name=data[f'{name}']['name'])
+		await webhook.send("Hello.", avatar_url=data[f'{name}']['image'])
 		await ctx.respond("Done", ephemeral=True)
 		await webhook.delete()
 
 
 	@discord.slash_command(name="send", description="Sends a message as your character")
 	async def roleplaysendaschar(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of the character"), message: discord.Option(str, description="Message to send as your character")):
-		if os.path.exists(f"roleplaydata/characters/{ctx.author.id}/{character}.json"):
-			with open(f"roleplaydata/characters/{ctx.author.id}/{character}.json") as f:
-				data = json.load(f)
-				character = await ctx.channel.create_webhook(name="CHARACTERHOOK")
-				await character.send(message, username=data['name'], avatar_url=data['image'])
+		try:
+			with open(f"roleplaydata/characters/{ctx.author.id}.json") as f1:
+				data = json.load(f1)
+				char = await ctx.channel.create_webhook(name=data[f'{character}']['name'])
+				await char.send(message, avatar_url=data['image'])
 				await ctx.respond("Sent", ephemeral=True)
-				await character.delete()
-		else: await ctx.respond("No such character found")
-		if os.path.exists(f"roleplaydata/logs/{ctx.guild.id}.json"):
-			with open(f"roleplaydata/logs/{ctx.guild.id}.json") as f:
-				data2 = json.load(f)
-				async with ClientSession() as session:
-					webhook = discord.Webhook.from_url(data2['url'], session=session)
-					embed = discord.Embed(colour=0x2f3136, title="New roleplay message")
-					embed.add_field(name="User", value=str(ctx.author))
-					embed.add_field(name="Character", value=character)
-					embed.add_field(name="Message", value=message)
-					embed.set_thumbnail(url=data['image'])
-					await webhook.send(embed=embed)
+				await char.delete()
+				if os.path.exists(f"roleplaydata/logs.json"):
+					with open(f"roleplaydata/logs.json") as f2:
+						data2 = json.load(f2)
+						async with ClientSession() as session:
+							webhook = discord.Webhook.from_url(data2[f'{ctx.guild.id}'], session=session)
+							embed = discord.Embed(colour=0x2f3136, title="New roleplay message")
+							embed.add_field(name="User", value=str(ctx.author))
+							embed.add_field(name="Character", value=character)
+							embed.add_field(name="Message", value=message)
+							embed.set_thumbnail(url=data['image'])
+							await webhook.send(embed=embed)
+		except KeyError:
+			await ctx.respond("No such character!", ephemeral=True)
 
 	
 	@discord.slash_command(name="delete", description="Deletes a character")
 	async def roleplaydeletechar(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of the character")):
 		try:
-			os.remove(f"roleplaydata/characters/{ctx.author.id}/{character}.json")
-			await ctx.respond("Done")
+			with open(f"roleplaydata/characters/{ctx.author.id}.json") as fr:
+				data = json.load(fr)
+				with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fw:
+					data.update({f"{character}": None})
+					await ctx.respond("Done")
+					json.dump(data, fw, indent=4)
 		except FileNotFoundError:
 			await ctx.respond("No such character found")
 
@@ -59,54 +65,34 @@ class cog(commands.Cog):
 	@discord.slash_command(name="characters", description="Lists all the characters you have")
 	async def roleplaydisplaycharacters(self, ctx: discord.ApplicationContext):
 		embed = discord.Embed(colour=0x2f3136)
-		for dir in os.listdir(f"roleplaydata/characters/{ctx.author.id}"):
-			with open(f"roleplaydata/characters/{ctx.author.id}/{dir}") as f:
-				data = json.load(f)
-				embed.add_field(name=data['name'], value=data['description'])
+		with open(f"roleplaydata/characters/{ctx.author.id}.json") as f:
+			data = json.load(f)
+			for item in list(data.keys()):
+				try:
+					embed.add_field(name=data[f'{item}']['name'], value=data[f'{item}']['description'])
+				except:
+					continue
 		await ctx.respond(embed=embed)
 
 
 	@discord.slash_command(name="show", description="Shows a character")
 	async def roleplayshowcharacter(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of character")):
-		with open(f"roleplaydata/characters/{ctx.author.id}/{character}.json") as f:
+		with open(f"roleplaydata/characters/{ctx.author.id}.json") as f:
 			data = json.load(f)
-			embed = discord.Embed(title=data['name'], colour=0x2f3136, description=data['description'])
+			embed = discord.Embed(title=data[f'{character}']['name'], colour=0x2f3136, description=data[f'{character}']['description'])
 			embed.set_thumbnail(url=data['image'])
-		await ctx.respond(embed=embed)
-
-
-	@discord.slash_command(name="edit", description="Edit a character")
-	async def roleplayedit(self, ctx: discord.ApplicationContext, oldname: discord.Option(str, description="Name of character you want to edit"), newname: discord.Option(str, description="New name for your character")=None, image: discord.Option(discord.Attachment, description="New attachment to set as profile picture of your character")=None, description: discord.Option(str, description="New description for your character")=None):
-		with open(f"roleplaydata/characters/{ctx.author.id}/{oldname}.json") as f1:
-			data = json.load(f1)
-			if newname == None:
-				newname = oldname
-			if image == None:
-				img = data['image']
-			else:
-				img = image.url
-			if description == None:
-				desc = data['description']
-			else:
-				desc = description
-			embed = discord.Embed(title=newname, colour=0x2f3136, description=data)
-			embed.set_thumbnail(url=image.url)
-			data2 = {"name": newname, "description": desc, "image": img}
-			os.remove(f"roleplaydata/characters/{ctx.author.id}/{oldname}.json")
-			with open(f"roleplaydata/characters/{ctx.author.id}/{newname}.json", "w") as f2:
-				json.dump(data2, f2, indent=4)
 		await ctx.respond(embed=embed)
 
 
 	@discord.slash_command(name="setlogs", description="Set the logging channel for roleplaying")
 	@commands.has_guild_permissions(administrator=True)
 	async def roleplaysetlogs(self, ctx: discord.ApplicationContext, channel: discord.Option(discord.TextChannel, description="Channel to set logs to")):
-		if not os.path.exists("roleplaydata/logs/"):
-			os.makedirs("roleplaydata/logs/")
-		with open(f"roleplaydata/logs/{ctx.guild.id}.json", "w") as f:
-			webhook = await channel.create_webhook(name=f"{self.bot.user.name} roleplay logs")
-			data = {
-				"url": webhook.url
-			}
-			json.dump(data, f)
+		with open(f"roleplaydata/logs.json") as fr:
+			data = json.load(fr)
+			with open(f"roleplaydata/logs.json", "w") as fw:
+				webhook = await channel.create_webhook(name=f"{self.bot.user.name} roleplay logs")
+				data.update({
+					f"{ctx.guild.id}": webhook.url
+				})
+				json.dump(data, fw)
 		await ctx.respond("Set")
