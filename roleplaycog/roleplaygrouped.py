@@ -14,6 +14,9 @@ class cog(commands.Cog):
 
 	@roleplay.command(name="create", description="Creates/edits a character")
 	async def roleplaycreatechar(self, ctx: discord.ApplicationContext, image: discord.Option(discord.Attachment, description="Attachment to set as profile picture of your character"), name: discord.Option(str, description="Name of your character"), description: discord.Option(str, description="Description of your character")="No description"):
+		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
+			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+				json.dump({}, fuwu)
 		with open(f"roleplaydata/characters/{ctx.author.id}.json") as fr:
 			data = json.load(fr)
 			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fw:
@@ -29,6 +32,9 @@ class cog(commands.Cog):
 
 	@roleplay.command(name="send", description="Sends a message as your character")
 	async def roleplaysendaschar(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of the character"), message: discord.Option(str, description="Message to send as your character")):
+		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
+			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+				json.dump({}, fuwu)
 		try:
 			with open(f"roleplaydata/characters/{ctx.author.id}.json") as f1:
 				data = json.load(f1)
@@ -53,6 +59,9 @@ class cog(commands.Cog):
 	
 	@roleplay.command(name="delete", description="Deletes a character")
 	async def roleplaydeletechar(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of the character")):
+		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
+			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+				json.dump({}, fuwu)
 		try:
 			with open(f"roleplaydata/characters/{ctx.author.id}.json") as fr:
 				data = json.load(fr)
@@ -66,6 +75,9 @@ class cog(commands.Cog):
 
 	@roleplay.command(name="characters", description="Lists all the characters you have")
 	async def roleplaydisplaycharacters(self, ctx: discord.ApplicationContext):
+		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
+			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+				json.dump({}, fuwu)
 		embed = discord.Embed(colour=0x2f3136)
 		with open(f"roleplaydata/characters/{ctx.author.id}.json") as f:
 			data = json.load(f)
@@ -79,6 +91,9 @@ class cog(commands.Cog):
 
 	@roleplay.command(name="show", description="Shows a character")
 	async def roleplayshowcharacter(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of character")):
+		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
+			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+				json.dump({}, fuwu)
 		with open(f"roleplaydata/characters/{ctx.author.id}.json") as f:
 			data = json.load(f)
 			embed = discord.Embed(title=data[f'{character}']['name'], colour=0x2f3136, description=data[f'{character}']['description'])
@@ -89,6 +104,9 @@ class cog(commands.Cog):
 	@roleplay.command(name="setlogs", description="Set the logging channel for roleplaying")
 	@commands.has_guild_permissions(administrator=True)
 	async def roleplaysetlogs(self, ctx: discord.ApplicationContext, channel: discord.Option(discord.TextChannel, description="Channel to set logs to")):
+		if not os.path.exists(f"roleplaydata/logs.json"):
+			with open(f"roleplaydata/logs.json", "w") as f:
+				json.dump({}, f)
 		with open(f"roleplaydata/logs.json") as fr:
 			data = json.load(fr)
 			with open(f"roleplaydata/logs.json", "w") as fw:

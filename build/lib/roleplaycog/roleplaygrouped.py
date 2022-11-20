@@ -12,7 +12,7 @@ class cog(commands.Cog):
 
 	roleplay = discord.SlashCommandGroup("roleplay", "Roleplay cog from roleplaycog.roleplaygrouped")
 
-	@roleplay.command(name="create", description="Creates/edits a character")
+	@discord.slash_command(name="create", description="Creates/edits a character")
 	async def roleplaycreatechar(self, ctx: discord.ApplicationContext, image: discord.Option(discord.Attachment, description="Attachment to set as profile picture of your character"), name: discord.Option(str, description="Name of your character"), description: discord.Option(str, description="Description of your character")="No description"):
 		with open(f"roleplaydata/characters/{ctx.author.id}.json") as fr:
 			data = json.load(fr)
@@ -27,7 +27,7 @@ class cog(commands.Cog):
 		await webhook.delete()
 
 
-	@roleplay.command(name="send", description="Sends a message as your character")
+	@discord.slash_command(name="send", description="Sends a message as your character")
 	async def roleplaysendaschar(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of the character"), message: discord.Option(str, description="Message to send as your character")):
 		try:
 			with open(f"roleplaydata/characters/{ctx.author.id}.json") as f1:
@@ -51,7 +51,7 @@ class cog(commands.Cog):
 			await ctx.respond("No such character!", ephemeral=True)
 
 	
-	@roleplay.command(name="delete", description="Deletes a character")
+	@discord.slash_command(name="delete", description="Deletes a character")
 	async def roleplaydeletechar(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of the character")):
 		try:
 			with open(f"roleplaydata/characters/{ctx.author.id}.json") as fr:
@@ -64,7 +64,7 @@ class cog(commands.Cog):
 			await ctx.respond("No such character found")
 
 
-	@roleplay.command(name="characters", description="Lists all the characters you have")
+	@discord.slash_command(name="characters", description="Lists all the characters you have")
 	async def roleplaydisplaycharacters(self, ctx: discord.ApplicationContext):
 		embed = discord.Embed(colour=0x2f3136)
 		with open(f"roleplaydata/characters/{ctx.author.id}.json") as f:
@@ -77,7 +77,7 @@ class cog(commands.Cog):
 		await ctx.respond(embed=embed)
 
 
-	@roleplay.command(name="show", description="Shows a character")
+	@discord.slash_command(name="show", description="Shows a character")
 	async def roleplayshowcharacter(self, ctx: discord.ApplicationContext, character: discord.Option(str, description="Name of character")):
 		with open(f"roleplaydata/characters/{ctx.author.id}.json") as f:
 			data = json.load(f)
@@ -86,7 +86,7 @@ class cog(commands.Cog):
 		await ctx.respond(embed=embed)
 
 
-	@roleplay.command(name="setlogs", description="Set the logging channel for roleplaying")
+	@discord.slash_command(name="setlogs", description="Set the logging channel for roleplaying")
 	@commands.has_guild_permissions(administrator=True)
 	async def roleplaysetlogs(self, ctx: discord.ApplicationContext, channel: discord.Option(discord.TextChannel, description="Channel to set logs to")):
 		with open(f"roleplaydata/logs.json") as fr:
