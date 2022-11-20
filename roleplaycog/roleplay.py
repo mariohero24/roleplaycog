@@ -96,3 +96,6 @@ class cog(commands.Cog):
 				})
 				json.dump(data, fw)
 		await ctx.respond("Set")
+
+
+# py -3 -m twine upload --repository pypi dist/* 
