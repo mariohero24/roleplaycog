@@ -39,7 +39,7 @@ class cog(commands.Cog):
 			with open(f"roleplaydata/characters/{ctx.author.id}.json") as f1:
 				data = json.load(f1)
 				char = await ctx.channel.create_webhook(name=data[f'{character}']['name'])
-				await char.send(message, avatar_url=data['image'])
+				await char.send(message, avatar_url=data[f'{character}']['image'])
 				await ctx.respond("Sent", ephemeral=True)
 				await char.delete()
 				if os.path.exists(f"roleplaydata/logs.json"):
@@ -51,7 +51,7 @@ class cog(commands.Cog):
 							embed.add_field(name="User", value=str(ctx.author))
 							embed.add_field(name="Character", value=character)
 							embed.add_field(name="Message", value=message)
-							embed.set_thumbnail(url=data['image'])
+							embed.set_thumbnail(url=data[f'{character}']['image'])
 							await webhook.send(embed=embed)
 		except KeyError:
 			await ctx.respond("No such character!", ephemeral=True)
@@ -97,7 +97,7 @@ class cog(commands.Cog):
 		with open(f"roleplaydata/characters/{ctx.author.id}.json") as f:
 			data = json.load(f)
 			embed = discord.Embed(title=data[f'{character}']['name'], colour=0x2f3136, description=data[f'{character}']['description'])
-			embed.set_thumbnail(url=data['image'])
+			embed.set_thumbnail(url=data[f'{character}']['image'])
 		await ctx.respond(embed=embed)
 
 
