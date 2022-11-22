@@ -131,5 +131,7 @@ class cog(commands.Cog):
 				json.dump(data, fw)
 		await ctx.respond("Set")
 
+def setup(bot):
+	bot.add_cog(cog(bot))
 
 # py -3 -m twine upload --repository pypi dist/* 

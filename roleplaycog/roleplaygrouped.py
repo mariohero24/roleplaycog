@@ -13,7 +13,7 @@ class cog(commands.Cog):
 	roleplay = discord.SlashCommandGroup("roleplay", "Roleplay cog from roleplaycog.roleplaygrouped")
 
 
-	@roleplay.command(description="Shows information about the roleplay extension")
+	@roleplay.command(name="info", description="Shows information about the roleplay extension")
 	async def roleplayinfo(self, ctx: discord.ApplicationContext):
 		embed = discord.Embed(colour=0x2f3136, title=f"{roleplaycog.__name__.title()} v{roleplaycog.__version__}", description="Welcome to roleplaycog! Lets go through the commands and their usages.")
 		embed.add_field(name="create", value="Creates/edits a character using the given information.", inline=False)
@@ -131,5 +131,7 @@ class cog(commands.Cog):
 				json.dump(data, fw)
 		await ctx.respond("Set")
 
+def setup(bot):
+	bot.add_cog(cog(bot))
 
 # py -3 -m twine upload --repository pypi dist/* 
