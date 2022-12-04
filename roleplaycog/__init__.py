@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
-__version__ = "0.5.0"
+from ._version import __version__
 __author__ = "Guard Boi"
 __email__ = "guard@cow.futbol"
 __description__ = "Roleplay cog for py-cord"

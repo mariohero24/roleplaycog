@@ -1,22 +1,21 @@
 import discord, json, os
 from randseal.utils import blank
 from aiohttp import ClientSession
-from discord.ext import commands
+from discord.ext import commands, bridge
 from ._version import __version__
 
 description = None
 
 class cog(commands.Cog):
-	def __init__(self, bot: commands.Bot):
+	def __init__(self, bot: bridge.Bot):
 		self.bot = bot
 		if not os.path.exists("roleplaydata/characters/"):
 			os.makedirs("roleplaydata/characters")
-	roleplay = discord.SlashCommandGroup("roleplay", "Roleplay cog from roleplaycog.roleplaygrouped")
 
 
-	@discord.slash_command(description="Shows information about the roleplay extension")
-	async def roleplayinfo(self, ctx: discord.ApplicationContext):
-		embed = discord.Embed(colour=blank(), title=f"roleplaycog v{__version__}", description="Welcome to roleplaycog! Lets go through the commands and their usages.")
+	@bridge.bridge_command(description="Shows information about the roleplay extension")
+	async def roleplayinfo(self, ctx: bridge.BridgeContext):
+		embed = discord.Embed(colour=blank(), title=f"roleplaycog v{__version__}", description="Welcome to roleplaycog! Lets go through the commands and their usages. (Tip: You can have multi word character names by encasing their name in \", \', or \"\"\".")
 		embed.add_field(name="create", value="Creates/edits a character using the given information.", inline=False)
 		embed.add_field(name="send", value="Creates a webhook, and sends a message, using it as your character.", inline=False)
 		embed.add_field(name="delete", value="Delete a character by name.", inline=False)
@@ -27,8 +26,8 @@ class cog(commands.Cog):
 		await ctx.respond(embed=embed, ephemeral=True)
 
 
-	@discord.slash_command(name="create", description="Creates/edits a character")
-	async def roleplaycreatechar(self, ctx: discord.ApplicationContext, image: discord.Option(discord.Attachment, description="Attachment to set as profile picture of your character"), name: discord.Option(description="Name of your character"), description: discord.Option(description="Description of your character")="No description"):
+	@bridge.bridge_command(name="create", description="Creates/edits a character")
+	async def roleplaycreatechar(self, ctx: bridge.BridgeContext, image_url, name, *, description="No description"):
 		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
 			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				json.dump({}, fuwu)
@@ -36,7 +35,7 @@ class cog(commands.Cog):
 			data = json.load(fr)
 			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fw:
 				data.update({f"{name}": {
-					"name": name, "image": image.url, "description": description
+					"name": name, "image": image_url, "description": description
 				}})
 				json.dump(data, fw, indent=4)
 		webhook = await ctx.channel.create_webhook(name=data[f'{name}']['name'])
@@ -45,8 +44,8 @@ class cog(commands.Cog):
 		await webhook.delete()
 
 
-	@discord.slash_command(name="send", description="Sends a message as your character")
-	async def roleplaysendaschar(self, ctx: discord.ApplicationContext, character: discord.Option(description="Name of the character"), message: discord.Option(description="Message to send as your character")):
+	@bridge.bridge_command(name="send", description="Sends a message as your character")
+	async def roleplaysendaschar(self, ctx: bridge.BridgeContext, character, *, message):
 		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
 			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				json.dump({}, fuwu)
@@ -72,8 +71,8 @@ class cog(commands.Cog):
 			pass
 
 	
-	@discord.slash_command(name="delete", description="Deletes a character")
-	async def roleplaydeletechar(self, ctx: discord.ApplicationContext, character: discord.Option(description="Name of the character")):
+	@bridge.bridge_command(name="delete", description="Deletes a character")
+	async def roleplaydeletechar(self, ctx: bridge.BridgeContext, *, character):
 		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
 			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				json.dump({}, fuwu)
@@ -88,8 +87,8 @@ class cog(commands.Cog):
 			await ctx.respond("No such character found")
 
 
-	@discord.slash_command(name="characters", description="Lists all the characters you have")
-	async def roleplaydisplaycharacters(self, ctx: discord.ApplicationContext):
+	@bridge.bridge_command(name="characters", description="Lists all the characters you have")
+	async def roleplaydisplaycharacters(self, ctx: bridge.BridgeContext):
 		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
 			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				json.dump({}, fuwu)
@@ -104,8 +103,8 @@ class cog(commands.Cog):
 		await ctx.respond(embed=embed)
 
 
-	@discord.slash_command(name="show", description="Shows a character")
-	async def roleplayshowcharacter(self, ctx: discord.ApplicationContext, character: discord.Option(description="Name of character")):
+	@bridge.bridge_command(name="show", description="Shows a character")
+	async def roleplayshowcharacter(self, ctx: bridge.BridgeContext, *, character):
 		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
 			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				json.dump({}, fuwu)
@@ -116,9 +115,9 @@ class cog(commands.Cog):
 		await ctx.respond(embed=embed)
 
 
-	@discord.slash_command(name="setlogs", description="Set the logging channel for roleplaying")
+	@bridge.bridge_command(name="setlogs", description="Set the logging channel for roleplaying")
 	@commands.has_guild_permissions(administrator=True)
-	async def roleplaysetlogs(self, ctx: discord.ApplicationContext, channel: discord.Option(discord.TextChannel, description="Channel to set logs to")):
+	async def roleplaysetlogs(self, ctx: bridge.BridgeContext, channel: discord.TextChannel):
 		if not os.path.exists(f"roleplaydata/logs.json"):
 			with open(f"roleplaydata/logs.json", "w") as f:
 				json.dump({}, f)
@@ -132,7 +131,7 @@ class cog(commands.Cog):
 				json.dump(data, fw)
 		await ctx.respond("Set")
 
-def setup(bot):
+def setup(bot: bridge.Bot):
 	bot.add_cog(cog(bot))
 
 # python3 -m twine upload --repository pypi dist/* 

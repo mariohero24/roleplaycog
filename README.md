@@ -4,12 +4,16 @@ This package is a cog edition of [my roleplay bot repository](https://github.com
 ```cs
 pip install roleplaycog
 ```
-## Setup
-In your main bot file:
+## Setup examples
+If you want normal slash commands:
 ```py
-bot.load_extension(".roleplay", package="roleplaycog")
+discord.ext.commands.Bot.load_extension(".roleplay", package="roleplaycog")
 ```
-Or if you want all the commands to be in a slash command group:
+Elif you want all the commands to be in a slash command group:
 ```py
-bot.load_extension(".roleplaygrouped", package="roleplaycog")
+discord.ext.commands.Bot.load_extension(".roleplaygrouped", package="roleplaycog")
+```
+Elif you want all the commands to be bridge commands:
+```py
+discord.ext.bridge.Bot.load_extension(".roleplaybridged", package="roleplaycog")
 ```
