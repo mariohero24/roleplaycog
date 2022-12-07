@@ -1,10 +1,11 @@
 import discord, json, os
-from randseal.utils import blank
 from aiohttp import ClientSession
 from discord.ext import commands, bridge
 from ._version import __version__
 
 description = None
+from randseal import Client
+client = Client()
 
 class cog(commands.Cog):
 	def __init__(self, bot: bridge.Bot):
@@ -15,7 +16,7 @@ class cog(commands.Cog):
 
 	@bridge.bridge_command(description="Shows information about the roleplay extension")
 	async def roleplayinfo(self, ctx: bridge.BridgeContext):
-		embed = discord.Embed(colour=blank(), title=f"roleplaycog v{__version__}", description="Welcome to roleplaycog! Lets go through the commands and their usages. (Tip: You can have multi word character names by encasing their name in \", \', or \"\"\".")
+		embed = discord.Embed(colour=client.blank(), title=f"roleplaycog v{__version__}", description="Welcome to roleplaycog! Lets go through the commands and their usages. (Tip: You can have multi word character names by encasing their name in \", \', or \"\"\".")
 		embed.add_field(name="create", value="Creates/edits a character using the given information.", inline=False)
 		embed.add_field(name="send", value="Creates a webhook, and sends a message, using it as your character.", inline=False)
 		embed.add_field(name="delete", value="Delete a character by name.", inline=False)
@@ -61,7 +62,7 @@ class cog(commands.Cog):
 						data2 = json.load(f2)
 						async with ClientSession() as session:
 							webhook = discord.Webhook.from_url(data2[f'{ctx.guild_id}'], session=session)
-							embed = discord.Embed(colour=blank(), title="New roleplay message")
+							embed = discord.Embed(colour=client.blank(), title="New roleplay message")
 							embed.add_field(name="User", value=str(ctx.author))
 							embed.add_field(name="Character", value=character)
 							embed.add_field(name="Message", value=message)
@@ -92,7 +93,7 @@ class cog(commands.Cog):
 		if not os.path.exists(f"roleplaydata/characters/{ctx.author.id}.json"):
 			with open(f"roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				json.dump({}, fuwu)
-		embed = discord.Embed(colour=blank())
+		embed = discord.Embed(colour=client.blank())
 		with open(f"roleplaydata/characters/{ctx.author.id}.json") as f:
 			data = json.load(f)
 			for item in list(data.keys()):
@@ -110,7 +111,7 @@ class cog(commands.Cog):
 				json.dump({}, fuwu)
 		with open(f"roleplaydata/characters/{ctx.author.id}.json") as f:
 			data = json.load(f)
-			embed = discord.Embed(title=data[f'{character}']['name'], colour=blank(), description=data[f'{character}']['description'])
+			embed = discord.Embed(title=data[f'{character}']['name'], colour=client.blank(), description=data[f'{character}']['description'])
 			embed.set_thumbnail(url=data[f'{character}']['image'])
 		await ctx.respond(embed=embed)
 
