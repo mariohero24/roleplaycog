@@ -1,12 +1,10 @@
-del open
 from randseal import Client, BLANK
 from discord import Bot, TextChannel, Webhook, SlashCommandGroup, guild_only, ApplicationContext, Embed, option, Attachment, AllowedMentions
 from os import makedirs, path
-from aiofiles import open
+from aiofiles import open as aiopen
 from datetime import datetime
 from discord.ext.commands import Cog, has_permissions
 from importlib.metadata import version
-
 __version__ = version("roleplaycog")
 
 description = ...
@@ -22,7 +20,7 @@ class Roleplay(Cog):
 	async def webhooks(self, channel: TextChannel):
 		directory = "database/roleplaydata/channels.json"
 		if not path.exists(directory):
-			async with open(directory, "w") as fdebug:
+			async with aiopen(directory, "w") as fdebug:
 				await fdebug.write("{}")
 		data: dict = await client.jsonload(directory)
 		if data.get(f"{channel.id}", None) != None:
@@ -63,7 +61,7 @@ class Roleplay(Cog):
 	async def create(self, ctx: ApplicationContext, image: Attachment, name: str, description: str):
 		await ctx.response.defer(ephemeral=True)
 		if not path.exists(f"database/roleplaydata/characters/{ctx.user.id}.json"):
-			async with open(f"database/roleplaydata/characters/{ctx.user.id}.json", "w") as fuwu:
+			async with aiopen(f"database/roleplaydata/characters/{ctx.user.id}.json", "w") as fuwu:
 				await fuwu.write("{}")
 		data: dict = await client.jsonload(f"database/roleplaydata/characters/{ctx.user.id}.json")
 		data.update({name: {
@@ -81,7 +79,7 @@ class Roleplay(Cog):
 	async def send(self, ctx: ApplicationContext, character: str, message: str):
 		await ctx.response.defer(ephemeral=True)
 		if not path.exists(f"database/roleplaydata/characters/{ctx.author.id}.json"):
-			async with open(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+			async with aiopen(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				await fuwu.write("{}")
 		data: dict = await client.jsonload(f"database/roleplaydata/characters/{ctx.author.id}.json")
 		dal: dict = data.get(character, None)
@@ -110,7 +108,7 @@ class Roleplay(Cog):
 	async def delete(self, ctx: ApplicationContext, character: str):
 		await ctx.response.defer(ephemeral=True)
 		if not path.exists(f"database/roleplaydata/characters/{ctx.author.id}.json"):
-			async with open(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+			async with aiopen(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				await fuwu.write("{}")
 		data: dict = await client.jsonload(
 			f"database/roleplaydata/characters/{ctx.author.id}.json")
@@ -128,7 +126,7 @@ class Roleplay(Cog):
 	async def characters(self, ctx: ApplicationContext):
 		await ctx.response.defer()
 		if not path.exists(f"database/roleplaydata/characters/{ctx.author.id}.json"):
-			async with open(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+			async with aiopen(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				await fuwu.write("{}")
 		embed = Embed(colour=BLANK)
 		data: dict = await client.jsonload(f"database/roleplaydata/characters/{ctx.author.id}.json")
@@ -143,7 +141,7 @@ class Roleplay(Cog):
 	async def show(self, ctx: ApplicationContext, character: str):
 		await ctx.response.defer()
 		if not path.exists(f"database/roleplaydata/characters/{ctx.author.id}.json"):
-			async with open(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+			async with aiopen(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				await fuwu.write("{}")
 		data: dict = await client.jsonload(f"database/roleplaydata/characters/{ctx.author.id}.json")
 		dal = data.get(character, None)
@@ -163,7 +161,7 @@ class Roleplay(Cog):
 	async def setlogs(self, ctx: ApplicationContext, channel: TextChannel):
 		await ctx.response.defer(ephemeral=True)
 		if not path.exists(f"database/roleplaydata/characters/{ctx.author.id}.json"):
-			async with open(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
+			async with aiopen(f"database/roleplaydata/characters/{ctx.author.id}.json", "w") as fuwu:
 				await fuwu.write("{}")
 		data: dict = await client.jsonload(f"database/roleplaydata/logs.json")
 		webhook = await channel.create_webhook(name=f"{self.bot.user.name} roleplay logs")
