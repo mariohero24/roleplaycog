@@ -1,19 +1,20 @@
 # Roleplay Cog
-This package is a cog edition of [my roleplay bot repository](https://github.com/mariohero24/Roleplay-Bot)
+This package is a cog edition of [my roleplay bot repository](https://github.com/mariohero24/Roleplay-Bot) that has been heavily modified
 ## Installation
 ```cs
 pip install roleplaycog
 ```
-## Setup examples
-If you want normal slash commands:
+## Setup
 ```py
-discord.ext.commands.Bot.load_extension(".roleplay", package="roleplaycog")
-```
-Elif you want all the commands to be in a slash command group:
-```py
-discord.ext.commands.Bot.load_extension(".roleplaygrouped", package="roleplaycog")
-```
-Elif you want all the commands to be bridge commands:
-```py
-discord.ext.bridge.Bot.load_extension(".roleplaybridged", package="roleplaycog")
+import discord
+bot = discord.Bot()
+
+# Loading via the setup function
+bot.load_extension("roleplaycog")
+
+# Loading directly (why would you do this)
+from roleplaycog import Roleplay
+bot.add_cog(Roleplay(bot))
+
+bot.run("Token")
 ```

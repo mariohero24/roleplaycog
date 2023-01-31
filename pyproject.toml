@@ -2,8 +2,8 @@
 requires = [
     "setuptools>=54",
 	"py-cord",
-    "aiohttp",
     "randseal",
+    "aiofiles",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"

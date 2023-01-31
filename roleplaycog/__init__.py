@@ -1,6 +1,6 @@
 """MIT License
 
-Copyright (c) 2022 Guard Boi
+Copyright (c) 2022-Present Guard Boi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +20,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
-from ._version import __version__
-__author__ = "Guard Boi"
-__email__ = "guard@cow.futbol"
-__description__ = "Roleplay cog for py-cord"
-__licence__ = "MIT"
-
+from .roleplay import __version__, Roleplay, setup
