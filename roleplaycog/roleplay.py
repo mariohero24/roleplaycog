@@ -27,6 +27,8 @@ class Roleplay(Cog):
 			return Webhook.from_url(data.get(f"{channel.id}"), session=client.session2)
 		else:
 			webhook = await channel.create_webhook(name=f"{channel.guild.me.name} Roleplay Webhook", reason="Webhook not found in channel")
+			data.update({f"{channel.id}": webhook.url})
+			await client.jsondump(data, directory)
 			return webhook
 
 	roleplay = SlashCommandGroup(
